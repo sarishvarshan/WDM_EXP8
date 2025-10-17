@@ -1,5 +1,5 @@
 ### EX8 Web Scraping On E-commerce platform using BeautifulSoup
-### DATE: 
+### DATE: 17/10/25
 ### AIM: To perform Web Scraping on Amazon using (beautifulsoup) Python.
 ### Description: 
 <div align = "justify">
@@ -26,54 +26,66 @@ One can search, navigate, and modify data using a parser. It’s versatile and s
 
 ### Program:
 ```PYTHON
+
 import requests
 from bs4 import BeautifulSoup
-import re
 import matplotlib.pyplot as plt
+import re
 
-def convert_price_to_float(price):
-    # Remove currency symbols and commas, and then convert to float
-    price = re.sub(r'[^\d.]', '', price)  # Remove non-digit characters except '.'
-    return float(price) if price else 0.0
-
-def get_amazon_products(search_query):
-    base_url = 'https://www.amazon.in'
+def get_snapdeal_products(search_query):
+    url = f'https://www.snapdeal.com/search?keyword={search_query.replace(" ", "%20")}'
     headers = {
-        'User-Agent': 'Your User Agent'  # Add your User Agent here
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36'
     }
 
-    search_query = search_query.replace(' ', '+')
-    url = f'{base_url}/s?k={search_query}'
-
     response = requests.get(url, headers=headers)
-    products_data = []  # List to store product information
+    products_data = []
 
     if response.status_code == 200:
-        /* TYPE YOUR CODE HERE
+        soup = BeautifulSoup(response.content, 'html.parser')
+        products = soup.find_all('div', {'class': 'product-tuple-listing'})
 
-    return sorted(products_data, key=lambda x: convert_price_to_float(x['Price']))
+        for product in products:
+            title = product.find('p', {'class': 'product-title'})
+            price = product.find('span', {'class': 'product-price'})
+            discount = product.find('div', {'class': 'product-discount'}) or product.find('span', {'class': 'product-discount'})
+            rating = product.find('div', {'class': 'filled-stars'})  # rating via style width
 
-search_query = input('Enter product to search on Amazon: ')
-products = get_amazon_products(search_query)
+            if title and price:
+                product_name = title.text.strip()
+                product_price = float(price.get('data-price', '0'))
+                product_discount = discount.text.strip() if discount else "No discount"
+                product_rating = rating['style'].split(':')[-1].split('%')[0].strip() + "%" if rating else "No rating"
 
-# Displaying product data using a bar chart
-if products:  # Check if products list is not empty
-    product_names = [product['Product'][:30] if len(product['Product']) > 30 else product['Product'] for product in products]
-    product_prices = [convert_price_to_float(product['Price']) for product in products]
+                products_data.append({
+                    'Product': product_name,
+                    'Price': product_price,
+                    'Rating': product_rating,
+                    'Discount': product_discount
+                })
 
-    plt.figure(figsize=(10, 6))
-    plt.barh(range(len(product_prices)), product_prices, color='skyblue')
-    plt.xlabel('Price')
-    plt.ylabel('Product')
-    plt.title(f'Products and their Prices on Amazon for {search_query.capitalize()} (Ascending Order)')
-    plt.yticks(range(len(product_prices)), product_names)  # Setting y-axis labels as shortened product names
-    plt.tight_layout()
-    plt.show()
-else:
-    print('No products found.')
+                # Print each product details
+                print(f'Product: {product_name}')
+                print(f'Price: ₹{product_price}')
+                print(f'Rating: {product_rating}')
+                print(f'Discount: {product_discount}')
+                print('---')
+    else:
+        print('Failed to retrieve content')
+
+    return products_data
+
+# Main execution
+if __name__ == "__main__":
+    search_query = input('Enter product to search on Snapdeal: ')
+    products = get_snapdeal_products(search_query)
+
 
 ```
 
 ### Output:
+<img width="1241" height="633" alt="image" src="https://github.com/user-attachments/assets/345bc532-ecd0-4549-bf96-ab6dcc539ebd" />
+
 
 ### Result:
+Thus,To perform Web Scraping on Amazon using (beautifulsoup) Python is executed successfully.
