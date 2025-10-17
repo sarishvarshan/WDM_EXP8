@@ -1,5 +1,7 @@
-### EX8 Web Scraping On E-commerce platform using BeautifulSoup
+### EX NO:8 Web Scraping On E-commerce platform using BeautifulSoup
 ### DATE: 17/10/25
+### NAME: SARISH VARSHAN V
+### REG NO: 212223230196
 ### AIM: To perform Web Scraping on Amazon using (beautifulsoup) Python.
 ### Description: 
 <div align = "justify">
